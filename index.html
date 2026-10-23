@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <title>Ruta Moto Patagonia - Rafael Pirela</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <meta name="theme-color" content="#0f172a" />
+  <meta name="theme-color" content="#0b1120" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
@@ -21,6 +21,7 @@
       --border: #334155;
       --accent: #38bdf8;
       --danger: #ef4444;
+      --warning: #f59e0b;
       --success: #10b981;
     }
 
@@ -42,8 +43,8 @@
     }
 
     #sidebar {
-      width: 420px;
-      min-width: 360px;
+      width: 430px;
+      min-width: 370px;
       height: 100%;
       background: var(--bg-surface);
       display: flex;
@@ -65,75 +66,84 @@
       background: #0f172a;
     }
 
-    /* Filtro oscuro para que el mapa libre coincida con el modo oscuro */
-    .dark-map-tiles {
-      filter: brightness(0.65) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.75);
+    /* Tonos oscuros y contraste de relieve 3D */
+    .leaflet-tile-pane {
+      filter: brightness(0.85) contrast(1.15) saturate(0.9);
     }
 
     .header {
-      padding: 16px;
+      padding: 14px 16px;
       background: var(--bg-main);
       border-bottom: 1px solid var(--border);
     }
     .header h1 {
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       font-weight: 700;
       color: #f8fafc;
       display: flex;
       align-items: center;
       gap: 8px;
     }
-    .header p {
-      font-size: 0.76rem;
-      color: #94a3b8;
-      margin-top: 3px;
+    .kpis-banner {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+      flex-wrap: wrap;
     }
+    .kpi-chip {
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 9999px;
+      letter-spacing: 0.3px;
+    }
+    .chip-blue { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
+    .chip-green { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .chip-amber { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
 
+    /* Calculadora */
     .calc-card {
-      margin: 12px 14px 6px 14px;
-      padding: 12px;
-      background: rgba(15, 23, 42, 0.7);
+      margin: 10px 14px 6px 14px;
+      padding: 10px 12px;
+      background: rgba(15, 23, 42, 0.75);
       border: 1px solid var(--border);
       border-radius: 8px;
     }
     .calc-title {
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       font-weight: 700;
       color: var(--accent);
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
     .calc-inputs {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      gap: 8px;
     }
     .calc-field label {
       display: block;
-      font-size: 0.68rem;
+      font-size: 0.65rem;
       color: #94a3b8;
-      margin-bottom: 3px;
+      margin-bottom: 2px;
     }
     .calc-field input {
       width: 100%;
       background: #1e293b;
       border: 1px solid var(--border);
       border-radius: 6px;
-      padding: 6px 8px;
+      padding: 5px 8px;
       color: white;
       font-size: 0.85rem;
       font-weight: 600;
       outline: none;
     }
-    .calc-field input:focus {
-      border-color: var(--accent);
-    }
     .calc-result {
-      margin-top: 8px;
+      margin-top: 6px;
       padding-top: 6px;
       border-top: 1px solid #334155;
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -146,27 +156,28 @@
     .actions-bar {
       display: flex;
       gap: 6px;
-      padding: 6px 14px 10px 14px;
+      padding: 6px 14px 8px 14px;
     }
     .btn {
       flex: 1;
-      padding: 8px 10px;
+      padding: 7px 8px;
       background: #334155;
       border: none;
       color: #f8fafc;
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       font-weight: 600;
       border-radius: 6px;
       cursor: pointer;
       display: inline-flex;
       justify-content: center;
       align-items: center;
-      gap: 5px;
+      gap: 4px;
       transition: background 0.2s;
     }
     .btn:hover { background: #475569; }
     .btn-primary { background: #0284c7; }
-    .btn-fuel.active { background: #ea580c; }
+    .btn-toggle.active { background: #ea580c; }
+    .btn-rest.active { background: #0d9488; }
 
     .days-list {
       flex: 1;
@@ -192,23 +203,10 @@
     .day-card.active {
       border-color: var(--accent);
       background: #1c2e4a;
-      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.4);
+      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.35);
     }
-    .day-card.danger {
-      border-color: var(--danger) !important;
-      background: rgba(239, 68, 68, 0.15) !important;
-    }
-    .day-badge-danger {
-      display: none;
-      font-size: 0.65rem;
-      font-weight: 800;
-      background: var(--danger);
-      color: white;
-      padding: 2px 6px;
-      border-radius: 4px;
-    }
-    .day-card.danger .day-badge-danger {
-      display: inline-block;
+    .day-card.warning-soft {
+      border-color: #f59e0b !important;
     }
 
     .day-header {
@@ -222,52 +220,84 @@
       font-weight: 700;
       color: #93c5fd;
     }
+    .badges-row {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
     .day-km {
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       font-weight: 700;
       padding: 2px 6px;
       border-radius: 4px;
       background: #064e3b;
       color: #6ee7b7;
     }
-    .day-km.danger {
-      background: #7f1d1d;
-      color: #fca5a5;
+    .day-km.caution {
+      background: #78350f;
+      color: #fde68a;
     }
+    .day-target-chip {
+      font-size: 0.65rem;
+      font-weight: 600;
+      padding: 2px 5px;
+      border-radius: 4px;
+      background: #1e293b;
+      color: #94a3b8;
+    }
+
     .day-title {
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       font-weight: 600;
       color: #f1f5f9;
       margin-bottom: 6px;
     }
+
+    /* Postas de descanso */
+    .rest-stops-container {
+      margin: 6px 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+    .rest-stop-tag {
+      font-size: 0.65rem;
+      background: #0f172a;
+      color: #cbd5e1;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid #334155;
+    }
+
     .day-meta {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       color: #94a3b8;
       border-top: 1px solid rgba(51, 65, 85, 0.6);
       padding-top: 6px;
     }
 
-    .fuel-marker {
-      background: #ea580c;
+    /* Marcadores circulares con relieve */
+    .map-marker {
       border: 2px solid #ffffff;
       border-radius: 50%;
       color: white;
       text-align: center;
-      line-height: 24px;
-      font-size: 13px;
-      box-shadow: 0 0 8px rgba(0,0,0,0.6);
+      font-size: 11px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.7);
+    }
+    .fuel-marker {
+      background: #ea580c;
+      line-height: 22px;
     }
     .fuel-marker.critical {
       background: #dc2626;
-      animation: pulse 1.8s infinite;
     }
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.8); }
-      70% { box-shadow: 0 0 0 8px rgba(220, 38, 38, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+    .rest-marker {
+      background: #0d9488;
+      line-height: 20px;
     }
 
     .mobile-tab-bar {
@@ -301,12 +331,8 @@
     }
 
     @media (max-width: 768px) {
-      body {
-        flex-direction: column;
-      }
-      .mobile-tab-bar {
-        display: grid;
-      }
+      body { flex-direction: column; }
+      .mobile-tab-bar { display: grid; }
       #sidebar {
         width: 100%;
         min-width: 100%;
@@ -333,9 +359,14 @@
   <div id="sidebar">
     <div class="header">
       <h1>🏍️ Circuito Patagónico</h1>
-      <p>Buenos Aires ➔ Las Grutas ➔ Bariloche ➔ CABA</p>
+      <div class="kpis-banner">
+        <span class="kpi-chip chip-blue">🎯 Meta: &le; 500 km/día</span>
+        <span class="kpi-chip chip-green">☕ Pausas ~100 km</span>
+        <span class="kpi-chip chip-amber">⛰️ Relieve 3D</span>
+      </div>
     </div>
 
+    <!-- Calculadora de autonomía -->
     <div class="calc-card">
       <div class="calc-title">⚙️ Autonomía de tu Moto</div>
       <div class="calc-inputs">
@@ -349,14 +380,15 @@
         </div>
       </div>
       <div class="calc-result">
-        <span>Autonomía segura (-10% reserva):</span>
+        <span>Margen seguro (-10% reserva):</span>
         <strong id="autonomyDisplay">~288 km</strong>
       </div>
     </div>
 
     <div class="actions-bar">
-      <button class="btn btn-fuel active" id="btnToggleFuel" onclick="toggleFuelLayer()">⛽ Nafta (ON)</button>
-      <button class="btn btn-primary" onclick="exportGPX()">📥 Bajar GPX</button>
+      <button class="btn btn-toggle active" id="btnToggleFuel" onclick="toggleFuelLayer()">⛽ Nafta (ON)</button>
+      <button class="btn btn-rest active" id="btnToggleRest" onclick="toggleRestLayer()">☕ Pausas (ON)</button>
+      <button class="btn btn-primary" onclick="exportGPX()">📥 GPX</button>
       <button class="btn" onclick="resetView()">🔄 Total</button>
     </div>
 
@@ -368,73 +400,199 @@
   </div>
 
   <div class="mobile-tab-bar">
-    <button class="tab-btn" id="tabMapBtn" onclick="switchMobileView('map')">
-      🗺️ Ver Mapa
-    </button>
-    <button class="tab-btn active" id="tabListBtn" onclick="switchMobileView('list')">
-      📋 Itinerario / Ficha
-    </button>
+    <button class="tab-btn" id="tabMapBtn" onclick="switchMobileView('map')">🗺️ Ver Mapa</button>
+    <button class="tab-btn active" id="tabListBtn" onclick="switchMobileView('list')">📋 Itinerario / Ficha</button>
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <script>
+    // Etapas con intervalos de descanso planificados cada ~100 km
     const stages = [
-      { day: 1, date: "Jue 1 Ene", name: "CABA ➔ Olavarría", routeInfo: "RN 3 y RP 51", surface: "Asfalto", color: "#38bdf8", points: [[-34.6037, -58.3816], [-35.4385, -58.8058], [-36.0157, -59.0975], [-36.8927, -60.3225]] },
-      { day: 2, date: "Vie 2 Ene", name: "Olavarría ➔ Médanos", routeInfo: "RN 3 y RN 22", surface: "Asfalto", color: "#38bdf8", points: [[-36.8927, -60.3225], [-38.3756, -60.2798], [-38.7196, -62.2724], [-38.8267, -62.6936]] },
-      { day: 3, date: "Sáb 3 Ene", name: "Médanos ➔ Las Grutas", routeInfo: "RN 3 Sur", surface: "Asfalto", color: "#38bdf8", points: [[-38.8267, -62.6936], [-40.8037, -62.9967], [-40.8094, -65.0931]] },
-      { day: 5, date: "Lun 5 Ene", name: "Las Grutas ➔ Los Menucos", routeInfo: "RN 23 (Estepa)", surface: "Asfalto", color: "#f59e0b", points: [[-40.8094, -65.0931], [-40.7107, -66.1558], [-40.6657, -67.7552], [-40.8443, -68.1465]] },
-      { day: 6, date: "Mar 6 Ene", name: "Los Menucos ➔ Bariloche", routeInfo: "RN 23 (Precaución obras)", surface: "Asfalto / Desvíos", color: "#f59e0b", points: [[-40.8443, -68.1465], [-41.3283, -69.5894], [-41.0333, -70.2667], [-41.1335, -71.3103]] },
-      { day: 9, date: "Vie 9 Ene", name: "Bariloche ➔ Neuquén", routeInfo: "RN 237 (Valle Encantado)", surface: "Asfalto", color: "#10b981", points: [[-41.1335, -71.3103], [-40.0461, -70.0768], [-39.2625, -68.7842], [-38.9516, -68.0591]] },
-      { day: 10, date: "Sáb 10 Ene", name: "Neuquén ➔ General Acha", routeInfo: "RN 151 y RP 20 (Desierto)", surface: "Asfalto", color: "#10b981", points: [[-38.9516, -68.0591], [-37.7719, -67.7161], [-37.5833, -66.6500], [-37.3770, -64.6043]] },
-      { day: 11, date: "Dom 11 Ene", name: "General Acha ➔ CABA", routeInfo: "RN 5 Centro Pampeano", surface: "Asfalto", color: "#10b981", points: [[-37.3770, -64.6043], [-36.6204, -64.2906], [-35.9750, -62.7347], [-34.6037, -58.3816]] }
+      {
+        day: 1,
+        date: "Jue 1 Ene",
+        name: "CABA ➔ Olavarría",
+        routeInfo: "RN 3 y RP 51",
+        surface: "Asfalto",
+        color: "#38bdf8",
+        points: [[-34.6037, -58.3816], [-35.4385, -58.8058], [-36.0157, -59.0975], [-36.8927, -60.3225]],
+        restStops: [
+          { name: "San Miguel del Monte", km: 107, coords: [-35.4385, -58.8058] },
+          { name: "Las Flores", km: 198, coords: [-36.0157, -59.0975] },
+          { name: "Azul", km: 305, coords: [-36.7771, -59.8584] }
+        ]
+      },
+      {
+        day: 2,
+        date: "Vie 2 Ene",
+        name: "Olavarría ➔ Médanos",
+        routeInfo: "RN 3 y RN 22",
+        surface: "Asfalto",
+        color: "#38bdf8",
+        points: [[-36.8927, -60.3225], [-37.8928, -60.5975], [-38.3756, -60.2798], [-38.7196, -62.2724], [-38.8267, -62.6936]],
+        restStops: [
+          { name: "A. Gonzales Chaves", km: 110, coords: [-37.8928, -60.5975] },
+          { name: "Tres Arroyos", km: 195, coords: [-38.3756, -60.2798] },
+          { name: "Coronel Dorrego", km: 285, coords: [-38.7183, -61.2828] }
+        ]
+      },
+      {
+        day: 3,
+        date: "Sáb 3 Ene",
+        name: "Médanos ➔ Las Grutas",
+        routeInfo: "RN 3 Sur",
+        surface: "Asfalto",
+        color: "#38bdf8",
+        points: [[-38.8267, -62.6936], [-39.5108, -62.6845], [-40.8037, -62.9967], [-40.8094, -65.0931]],
+        restStops: [
+          { name: "Pedro Luro", km: 95, coords: [-39.5108, -62.6845] },
+          { name: "Carmen de Patagones / Viedma", km: 210, coords: [-40.8037, -62.9967] },
+          { name: "San Antonio Oeste", km: 345, coords: [-40.7288, -64.9547] }
+        ]
+      },
+      {
+        day: 5,
+        date: "Lun 5 Ene",
+        name: "Las Grutas ➔ Los Menucos",
+        routeInfo: "RN 23 (Estepa)",
+        surface: "Asfalto",
+        color: "#f59e0b",
+        points: [[-40.8094, -65.0931], [-40.7107, -66.1558], [-40.5756, -67.2478], [-40.6657, -67.7552], [-40.8443, -68.1465]],
+        restStops: [
+          { name: "Valcheta", km: 105, coords: [-40.7107, -66.1558] },
+          { name: "Ministro Ramos Mexía", km: 205, coords: [-40.5756, -67.2478] },
+          { name: "Sierra Colorada", km: 260, coords: [-40.6657, -67.7552] }
+        ]
+      },
+      {
+        day: 6,
+        date: "Mar 6 Ene",
+        name: "Los Menucos ➔ Bariloche",
+        routeInfo: "RN 23 (Obras / Cordillera)",
+        surface: "Asfalto / Desvíos",
+        color: "#f59e0b",
+        points: [[-40.8443, -68.1465], [-41.3283, -69.5894], [-41.0333, -70.2667], [-41.1219, -70.5284], [-41.1335, -71.3103]],
+        restStops: [
+          { name: "Ing. Jacobacci", km: 140, coords: [-41.3283, -69.5894] },
+          { name: "Comallo", km: 215, coords: [-41.0333, -70.2667] },
+          { name: "Pilcaniyeu", km: 265, coords: [-41.1219, -70.5284] }
+        ]
+      },
+      {
+        day: 9,
+        date: "Vie 9 Ene",
+        name: "Bariloche ➔ Neuquén",
+        routeInfo: "RN 237 (Valle Encantado)",
+        surface: "Asfalto",
+        color: "#10b981",
+        points: [[-41.1335, -71.3103], [-40.7027, -71.0772], [-40.0461, -70.0768], [-39.2625, -68.7842], [-38.9516, -68.0591]],
+        restStops: [
+          { name: "Confluencia Traful", km: 70, coords: [-40.7027, -71.0772] },
+          { name: "Piedra del Águila", km: 195, coords: [-40.0461, -70.0768] },
+          { name: "Villa El Chocón", km: 350, coords: [-39.2625, -68.7842] }
+        ]
+      },
+      {
+        day: 10,
+        date: "Sáb 10 Ene",
+        name: "Neuquén ➔ General Acha",
+        routeInfo: "RN 151 y RP 20 (Desierto)",
+        surface: "Asfalto",
+        color: "#10b981",
+        points: [[-38.9516, -68.0591], [-37.8767, -67.7947], [-37.7719, -67.7161], [-37.5833, -66.6500], [-37.3770, -64.6043]],
+        restStops: [
+          { name: "Catriel", km: 130, coords: [-37.8767, -67.7947] },
+          { name: "25 de Mayo (La Pampa)", km: 165, coords: [-37.7719, -67.7161] },
+          { name: "Chacharramendi", km: 320, coords: [-37.5833, -66.6500] }
+        ]
+      },
+      {
+        day: 11,
+        date: "Dom 11 Ene",
+        name: "General Acha ➔ CABA",
+        routeInfo: "RN 5 Centro Pampeano",
+        surface: "Asfalto",
+        color: "#10b981",
+        points: [[-37.3770, -64.6043], [-36.6204, -64.2906], [-35.9750, -62.7347], [-35.4444, -60.8833], [-34.6037, -58.3816]],
+        restStops: [
+          { name: "Santa Rosa", km: 105, coords: [-36.6204, -64.2906] },
+          { name: "Trenque Lauquen", km: 245, coords: [-35.9750, -62.7347] },
+          { name: "9 de Julio", km: 380, coords: [-35.4444, -60.8833] }
+        ]
+      }
     ];
 
     const fuelStations = [
       { name: "YPF Valcheta", corridor: "RN 23", coords: [-40.7107, -66.1558], mandatory: true, alert: "Carga preventiva entrando a la RN 23." },
       { name: "YPF Ramos Mexía", corridor: "RN 23", coords: [-40.5756, -67.2478], mandatory: false, alert: "Posta intermedia en la estepa." },
       { name: "YPF Los Menucos", corridor: "RN 23", coords: [-40.8443, -68.1465], mandatory: true, alert: "Noche de posta. Llenar tanque al arribar." },
-      { name: "YPF Ing. Jacobacci", corridor: "RN 23", coords: [-41.3283, -69.5894], mandatory: true, alert: "Última estación antes del tramo de obras a Bariloche." },
-      { name: "Comallo (Puesto)", corridor: "RN 23", coords: [-41.0333, -70.2667], mandatory: false, alert: "Punto de emergencia si escasea nafta." },
-      { name: "YPF Piedra del Águila", corridor: "RN 237", coords: [-40.0461, -70.0768], mandatory: true, alert: "Punto neurálgico Bariloche - Neuquén." },
+      { name: "YPF Ing. Jacobacci", corridor: "RN 23", coords: [-41.3283, -69.5894], mandatory: true, alert: "Última estación antes del tramo a Bariloche." },
+      { name: "Comallo (Puesto)", corridor: "RN 23", coords: [-41.0333, -70.2667], mandatory: false, alert: "Auxilio si escasea nafta." },
+      { name: "YPF Piedra del Águila", corridor: "RN 237", coords: [-40.0461, -70.0768], mandatory: true, alert: "Posta obligatoria Bariloche - Neuquén." },
       { name: "YPF Villa El Chocón", corridor: "RN 237", coords: [-39.2625, -68.7842], mandatory: false, alert: "Carga previa al Gran Neuquén." },
       { name: "YPF Catriel", corridor: "RN 151", coords: [-37.8767, -67.7947], mandatory: false, alert: "Límite Río Negro / La Pampa." },
-      { name: "YPF / Shell 25 de Mayo", corridor: "RP 20", coords: [-37.7719, -67.7161], mandatory: true, alert: "CARGA OBLIGATORIA: Inicio de la Ruta del Desierto." },
-      { name: "Pampa Petrol Chacharramendi", corridor: "RP 20", coords: [-37.5833, -66.6500], mandatory: true, alert: "CARGA OBLIGATORIA: Oasis a mitad del desierto." },
-      { name: "YPF General Acha", corridor: "RN 152", coords: [-37.3770, -64.6043], mandatory: true, alert: "Fin de la travesía del desierto." }
+      { name: "YPF / Shell 25 de Mayo", corridor: "RP 20", coords: [-37.7719, -67.7161], mandatory: true, alert: "OBLIGATORIO: Inicio Ruta del Desierto." },
+      { name: "Pampa Petrol Chacharramendi", corridor: "RP 20", coords: [-37.5833, -66.6500], mandatory: true, alert: "OBLIGATORIO: Oasis central en el desierto." },
+      { name: "YPF General Acha", corridor: "RN 152", coords: [-37.3770, -64.6043], mandatory: true, alert: "Fin del desierto pampeano." }
     ];
 
-    // MAPA CON OPENSTREETMAP (100% Libre - Sin API Key requerida)
+    // MAPA CON RELIEVE SOMBREADO 3D (ESRI Shaded Relief + World Topo)
     const map = L.map('map', { zoomControl: false }).setView([-39.0, -65.0], 6);
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      className: 'dark-map-tiles',
-      attribution: '&copy; OpenStreetMap contributors',
+    // Capa base de relieve topográfico sombreado
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+      attribution: 'Tiles &copy; Esri, USGS, DeLorme, HERE',
       maxZoom: 18
     }).addTo(map);
 
     let polylineLayers = [];
     let fuelGroup = L.layerGroup().addTo(map);
+    let restGroup = L.layerGroup().addTo(map);
     let allPoints = [];
     let fuelVisible = true;
+    let restVisible = true;
 
-    function renderFuel() {
+    function renderMarkers() {
+      // Combustible
       fuelStations.forEach(s => {
         const icon = L.divIcon({
           className: '',
-          html: `<div class="fuel-marker ${s.mandatory ? 'critical' : ''}" style="width:24px;height:24px;">⛽</div>`,
+          html: `<div class="map-marker fuel-marker ${s.mandatory ? 'critical' : ''}" style="width:24px;height:24px;">⛽</div>`,
           iconSize: [24, 24],
           iconAnchor: [12, 12]
         });
         const m = L.marker(s.coords, { icon: icon }).bindPopup(`
-          <div style="font-size:12px;color:#111827;padding:2px;">
-            <strong style="color:${s.mandatory ? '#dc2626' : '#d97706'};">${s.mandatory ? '🚨 OBLIGATORIO' : 'ℹ️ POSTA'}</strong><br>
+          <div style="font-size:12px;color:#0f172a;padding:2px;">
+            <strong style="color:${s.mandatory ? '#dc2626' : '#d97706'};">${s.mandatory ? '🚨 CARGA OBLIGATORIA' : 'ℹ️ POSTA ESTRATÉGICA'}</strong><br>
             <b>${s.name}</b> (${s.corridor})<br>
-            <span style="color:#4b5563;">${s.alert}</span>
+            <span>${s.alert}</span>
           </div>
         `);
         fuelGroup.addLayer(m);
+      });
+
+      // Pausas técnicas cada ~100 km
+      stages.forEach(st => {
+        if (st.restStops) {
+          st.restStops.forEach(r => {
+            const icon = L.divIcon({
+              className: '',
+              html: `<div class="map-marker rest-marker" style="width:20px;height:20px;">☕</div>`,
+              iconSize: [20, 20],
+              iconAnchor: [10, 10]
+            });
+            const m = L.marker(r.coords, { icon: icon }).bindPopup(`
+              <div style="font-size:12px;color:#0f172a;padding:2px;">
+                <strong style="color:#0f766e;">☕ PAUSA TÉCNICA (~100 KM)</strong><br>
+                <b>${r.name}</b> (km ${r.km} de la etapa)<br>
+                <span>Descanso de 15-20 min, hidratación y chequeo de equipaje.</span>
+              </div>
+            `);
+            restGroup.addLayer(m);
+          });
+        }
       });
     }
 
@@ -476,26 +634,30 @@
 
         if (card && kmEl) {
           if (exceeds) {
-            card.classList.add('danger');
-            kmEl.classList.add('danger');
+            card.classList.add('warning-soft');
+            kmEl.classList.add('caution');
             kmEl.innerText = `${s.distanceKm} km (+${s.distanceKm - range} km)`;
           } else {
-            card.classList.remove('danger');
-            kmEl.classList.remove('danger');
+            card.classList.remove('warning-soft');
+            kmEl.classList.remove('caution');
             kmEl.innerText = `${s.distanceKm} km`;
           }
         }
+
+        // Trazado sutil: color ámbar sin punteado agresivo
         if (p && p.line) {
           p.line.setStyle({
-            color: exceeds ? '#ef4444' : s.color,
-            dashArray: exceeds ? '6, 6' : null
+            color: exceeds ? '#f59e0b' : s.color,
+            weight: 4.5,
+            opacity: 0.9,
+            dashArray: null
           });
         }
       });
     }
 
     async function init() {
-      renderFuel();
+      renderMarkers();
       const list = document.getElementById('daysList');
 
       for (const s of stages) {
@@ -506,12 +668,18 @@
 
         const line = L.polyline(routeData.latLngs, {
           color: s.color,
-          weight: 4,
-          opacity: 0.85
+          weight: 4.5,
+          opacity: 0.9
         }).addTo(map);
 
         polylineLayers.push({ day: s.day, line: line, bounds: line.getBounds() });
         allPoints.push(...s.points);
+
+        // Generar lista visual de paradas cada 100km
+        const restTags = (s.restStops || []).map(r => `<span class="rest-stop-tag">☕ ${r.name} (${r.km}k)</span>`).join('');
+
+        // Validación frente al promedio de 500km/día
+        const targetStatus = s.distanceKm <= 500 ? '✅ &le; 500k/día' : '⚠️ > 500k/día';
 
         const card = document.createElement('div');
         card.className = 'day-card';
@@ -519,12 +687,15 @@
         card.innerHTML = `
           <div class="day-header">
             <span class="day-date">Día ${s.day} • ${s.date}</span>
-            <span class="day-badge-danger">SUPERA AUTONOMÍA</span>
-            <span class="day-km" id="km-${s.day}">${s.distanceKm} km</span>
+            <div class="badges-row">
+              <span class="day-target-chip">${targetStatus}</span>
+              <span class="day-km" id="km-${s.day}">${s.distanceKm} km</span>
+            </div>
           </div>
           <div class="day-title">${s.name}</div>
+          <div class="rest-stops-container">${restTags}</div>
           <div class="day-meta">
-            <span>⏱️ ~${s.durationHours} h</span>
+            <span>⏱️ ~${s.durationHours} h marcha</span>
             <span>🛣️ ${s.surface}</span>
             <span>📍 ${s.routeInfo}</span>
           </div>
@@ -547,11 +718,11 @@
         const s = stages.find(st => st.day === p.day);
         const exceeds = s.distanceKm > safe;
         if (p.day === day) {
-          p.line.setStyle({ weight: 7, opacity: 1 });
+          p.line.setStyle({ weight: 7.5, opacity: 1, color: exceeds ? '#f59e0b' : s.color });
           p.line.bringToFront();
           map.fitBounds(p.bounds, { padding: [40, 40] });
         } else {
-          p.line.setStyle({ weight: 3, opacity: 0.3, color: exceeds ? '#ef4444' : s.color });
+          p.line.setStyle({ weight: 3, opacity: 0.25, color: s.color });
         }
       });
 
@@ -580,6 +751,20 @@
       fuelVisible = !fuelVisible;
     }
 
+    function toggleRestLayer() {
+      const btn = document.getElementById('btnToggleRest');
+      if (restVisible) {
+        map.removeLayer(restGroup);
+        btn.classList.remove('active');
+        btn.innerText = "☕ Pausas (OFF)";
+      } else {
+        map.addLayer(restGroup);
+        btn.classList.add('active');
+        btn.innerText = "☕ Pausas (ON)";
+      }
+      restVisible = !restVisible;
+    }
+
     function switchMobileView(view) {
       const sidebar = document.getElementById('sidebar');
       const tabMap = document.getElementById('tabMapBtn');
@@ -601,6 +786,13 @@
       let gpx = `<?xml version="1.0" encoding="UTF-8"?><gpx version="1.1" creator="RutaPatagonia" xmlns="http://www.topografix.com/GPX/1/1"><metadata><name>Circuito Patagonico</name></metadata>`;
       fuelStations.forEach(s => {
         gpx += `\n<wpt lat="${s.coords[0]}" lon="${s.coords[1]}"><name>GAS: ${s.name}</name><desc>${s.alert}</desc></wpt>`;
+      });
+      stages.forEach(st => {
+        if (st.restStops) {
+          st.restStops.forEach(r => {
+            gpx += `\n<wpt lat="${r.coords[0]}" lon="${r.coords[1]}"><name>PAUSA: ${r.name}</name><desc>Descanso de 100 km</desc></wpt>`;
+          });
+        }
       });
       stages.forEach(s => {
         if (s.latLngs) {
