@@ -1,571 +1,639 @@
-{\rtf1\ansi\ansicpg1252\cocoartf2870
-\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
-{\colortbl;\red255\green255\blue255;}
-{\*\expandedcolortbl;;}
-\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Ruta Moto Patagonia - Rafael Pirela</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-\f0\fs24 \cf0 <!DOCTYPE html>\
-<html lang="es">\
-<head>\
-  <meta charset="utf-8" />\
-  <title>Ruta Moto Pro + Calculadora de Autonom\'eda Din\'e1mica</title>\
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />\
-\
-  <!-- Leaflet CSS -->\
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />\
-\
-  <style>\
-    * \{ box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; \}\
-    body \{ display: flex; height: 100vh; overflow: hidden; background: #0f172a; color: #f8fafc; \}\
-\
-    #sidebar \{\
-      width: 420px;\
-      min-width: 360px;\
-      height: 100%;\
-      background: #1e293b;\
-      display: flex;\
-      flex-direction: column;\
-      border-right: 1px solid #334155;\
-      z-index: 1000;\
-    \}\
-    #map-container \{ flex: 1; height: 100%; position: relative; \}\
-    #map \{ width: 100%; height: 100%; \}\
-\
-    .header \{ padding: 14px 18px; background: #0f172a; border-bottom: 1px solid #334155; \}\
-    .header h1 \{ font-size: 1.15rem; font-weight: 700; color: #38bdf8; display: flex; align-items: center; gap: 8px; \}\
-    .header p \{ font-size: 0.76rem; color: #94a3b8; margin-top: 2px; \}\
-\
-    /* Calculadora de Autonom\'eda */\
-    .calculator-box \{\
-      margin: 10px 14px 4px 14px;\
-      padding: 10px 14px;\
-      background: #0f172a;\
-      border: 1px solid #334155;\
-      border-radius: 8px;\
-    \}\
-    .calculator-title \{\
-      font-size: 0.76rem;\
-      font-weight: 700;\
-      color: #38bdf8;\
-      text-transform: uppercase;\
-      letter-spacing: 0.5px;\
-      margin-bottom: 8px;\
-      display: flex;\
-      justify-content: space-between;\
-    \}\
-    .inputs-grid \{\
-      display: grid;\
-      grid-template-columns: 1fr 1fr;\
-      gap: 10px;\
-    \}\
-    .input-group \{\
-      display: flex;\
-      flex-direction: column;\
-      gap: 4px;\
-    \}\
-    .input-group label \{\
-      font-size: 0.7rem;\
-      color: #94a3b8;\
-    \}\
-    .input-group input \{\
-      background: #1e293b;\
-      border: 1px solid #475569;\
-      border-radius: 6px;\
-      color: #f8fafc;\
-      padding: 6px 8px;\
-      font-size: 0.85rem;\
-      font-weight: 600;\
-      outline: none;\
-      transition: border-color 0.2s;\
-    \}\
-    .input-group input:focus \{\
-      border-color: #38bdf8;\
-    \}\
-    .range-summary \{\
-      margin-top: 8px;\
-      padding-top: 6px;\
-      border-top: 1px solid #1e293b;\
-      display: flex;\
-      justify-content: space-between;\
-      font-size: 0.72rem;\
-      color: #cbd5e1;\
-    \}\
-    .range-summary strong \{\
-      color: #34d399;\
-    \}\
-\
-    .actions-bar \{\
-      display: flex;\
-      flex-wrap: wrap;\
-      gap: 6px;\
-      padding: 6px 14px 10px 14px;\
-    \}\
-    .btn-action \{\
-      background: #0284c7;\
-      color: white;\
-      border: none;\
-      padding: 6px 10px;\
-      font-size: 0.72rem;\
-      font-weight: 600;\
-      border-radius: 6px;\
-      cursor: pointer;\
-      display: inline-flex;\
-      align-items: center;\
-      gap: 5px;\
-      transition: all 0.2s;\
-    \}\
-    .btn-action:hover \{ background: #0369a1; \}\
-    .btn-action.fuel-toggle \{ background: #b45309; \}\
-    .btn-action.fuel-toggle.active \{ background: #ea580c; \}\
-\
-    .days-list \{ flex: 1; overflow-y: auto; padding: 0 14px 14px 14px; display: flex; flex-direction: column; gap: 10px; \}\
-    .day-card \{\
-      background: #334155;\
-      border: 1px solid #475569;\
-      border-radius: 8px;\
-      padding: 12px;\
-      cursor: pointer;\
-      transition: all 0.2s ease;\
-      position: relative;\
-    \}\
-    .day-card:hover \{ border-color: #38bdf8; transform: translateY(-1px); \}\
-    .day-card.active \{ background: #1e3a5f; border-color: #38bdf8; box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.4); \}\
-\
-    /* Alerta cr\'edtica cuando excede autonom\'eda */\
-    .day-card.warning-danger \{\
-      border-color: #ef4444 !important;\
-      background: rgba(239, 68, 68, 0.12) !important;\
-    \}\
-    .day-card.warning-danger::before \{\
-      content: "\uc0\u9888 \u65039  SUPERA AUTONOM\'cdA";\
-      position: absolute;\
-      top: -7px;\
-      right: 10px;\
-      background: #dc2626;\
-      color: white;\
-      font-size: 0.62rem;\
-      font-weight: 800;\
-      padding: 1px 6px;\
-      border-radius: 4px;\
-      letter-spacing: 0.5px;\
-    \}\
-\
-    .day-header \{ display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; \}\
-    .day-date \{ font-weight: 700; font-size: 0.85rem; color: #7dd3fc; \}\
-    .day-tag \{ font-size: 0.72rem; font-weight: 700; padding: 2px 7px; border-radius: 4px; background: #064e3b; color: #34d399; \}\
-    .day-tag.danger \{ background: #7f1d1d; color: #fca5a5; \}\
-\
-    .day-title \{ font-size: 0.82rem; font-weight: 600; color: #f1f5f9; margin-bottom: 6px; \}\
-    .day-stats \{\
-      display: flex;\
-      gap: 10px;\
-      font-size: 0.72rem;\
-      color: #94a3b8;\
-      border-top: 1px solid #475569;\
-      padding-top: 6px;\
-      margin-top: 6px;\
-      flex-wrap: wrap;\
-    \}\
-\
-    /* Marcador custom de combustible */\
-    .fuel-marker-icon \{\
-      background: #ea580c;\
-      border: 2px solid #ffffff;\
-      border-radius: 50%;\
-      color: white;\
-      text-align: center;\
-      line-height: 24px;\
-      font-size: 13px;\
-      font-weight: bold;\
-      box-shadow: 0 0 10px rgba(234, 88, 12, 0.7);\
-    \}\
-    .fuel-marker-icon.danger \{\
-      background: #dc2626;\
-      animation: pulse 2s infinite;\
-    \}\
-    @keyframes pulse \{\
-      0% \{ box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); \}\
-      70% \{ box-shadow: 0 0 0 8px rgba(220, 38, 38, 0); \}\
-      100% \{ box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); \}\
-    \}\
-\
-    .leaflet-popup-content-wrapper \{\
-      background: #1e293b !important;\
-      color: #f8fafc !important;\
-      border: 1px solid #475569;\
-      border-radius: 8px !important;\
-    \}\
-    .leaflet-popup-tip \{ background: #1e293b !important; \}\
-  </style>\
-</head>\
-<body>\
-\
-  <div id="sidebar">\
-    <div class="header">\
-      <h1>\uc0\u55356 \u57293 \u65039  Patag\'f3nico Pro + Autonom\'eda</h1>\
-      <p>Buenos Aires \uc0\u10132  Las Grutas \u10132  Bariloche \u10132  CABA</p>\
-    </div>\
-\
-    <!-- Calculadora de Autonom\'eda -->\
-    <div class="calculator-box">\
-      <div class="calculator-title">\
-        <span>\uc0\u9881 \u65039  Configuraci\'f3n de la Moto</span>\
-      </div>\
-      <div class="inputs-grid">\
-        <div class="input-group">\
-          <label for="tankLiters">Tanque (Litros)</label>\
-          <input type="number" id="tankLiters" value="16" min="5" max="40" step="0.5" oninput="updateAutonomy()" />\
-        </div>\
-        <div class="input-group">\
-          <label for="kmPerLiter">Consumo (km / L)</label>\
-          <input type="number" id="kmPerLiter" value="20" min="8" max="45" step="0.5" oninput="updateAutonomy()" />\
-        </div>\
-      </div>\
-      <div class="range-summary">\
-        <span>Autonom\'eda segura (con 10% reserva):</span>\
-        <strong id="safeAutonomyDisplay">~288 km</strong>\
-      </div>\
-    </div>\
-\
-    <div class="actions-bar">\
-      <button class="btn-action fuel-toggle active" id="btnToggleFuel" onclick="toggleFuelLayer()">\uc0\u9981  Nafta (ON)</button>\
-      <button class="btn-action" onclick="exportGPX()">\uc0\u55357 \u56549  GPX</button>\
-      <button class="btn-action" style="background: #334155;" onclick="resetView()">\uc0\u55357 \u56580  Total</button>\
-    </div>\
-\
-    <div class="days-list" id="daysList"></div>\
-  </div>\
-\
-  <div id="map-container">\
-    <div id="map"></div>\
-  </div>\
-\
-  <!-- Leaflet JS -->\
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>\
-\
-  <script>\
-    // 1. Tramos del viaje\
-    const stages = [\
-      \{\
-        day: 1,\
-        date: "Jue 1 Ene",\
-        name: "CABA \uc0\u10132  Olavarr\'eda",\
-        routeInfo: "RN 3 y RP 51",\
-        surface: "Asfalto",\
-        defaultColor: "#38bdf8",\
-        points: [[-34.6037, -58.3816], [-35.4385, -58.8058], [-36.0157, -59.0975], [-36.8927, -60.3225]]\
-      \},\
-      \{\
-        day: 2,\
-        date: "Vie 2 Ene",\
-        name: "Olavarr\'eda \uc0\u10132  M\'e9danos",\
-        routeInfo: "RN 3 y RN 22",\
-        surface: "Asfalto",\
-        defaultColor: "#38bdf8",\
-        points: [[-36.8927, -60.3225], [-38.3756, -60.2798], [-38.7196, -62.2724], [-38.8267, -62.6936]]\
-      \},\
-      \{\
-        day: 3,\
-        date: "S\'e1b 3 Ene",\
-        name: "M\'e9danos \uc0\u10132  Las Grutas",\
-        routeInfo: "RN 3 Sur",\
-        surface: "Asfalto",\
-        defaultColor: "#38bdf8",\
-        points: [[-38.8267, -62.6936], [-40.8037, -62.9967], [-40.8094, -65.0931]]\
-      \},\
-      \{\
-        day: 5,\
-        date: "Lun 5 Ene",\
-        name: "Las Grutas \uc0\u10132  Los Menucos",\
-        routeInfo: "RN 23 (Estepa)",\
-        surface: "Asfalto",\
-        defaultColor: "#f59e0b",\
-        points: [[-40.8094, -65.0931], [-40.7107, -66.1558], [-40.6657, -67.7552], [-40.8443, -68.1465]]\
-      \},\
-      \{\
-        day: 6,\
-        date: "Mar 6 Ene",\
-        name: "Los Menucos \uc0\u10132  Bariloche",\
-        routeInfo: "RN 23 (Precauci\'f3n obras)",\
-        surface: "Asfalto / Obras",\
-        defaultColor: "#f59e0b",\
-        points: [[-40.8443, -68.1465], [-41.3283, -69.5894], [-41.0333, -70.2667], [-41.1335, -71.3103]]\
-      \},\
-      \{\
-        day: 9,\
-        date: "Vie 9 Ene",\
-        name: "Bariloche \uc0\u10132  Neuqu\'e9n",\
-        routeInfo: "RN 237 (Valle Encantado)",\
-        surface: "Asfalto",\
-        defaultColor: "#10b981",\
-        points: [[-41.1335, -71.3103], [-40.0461, -70.0768], [-39.2625, -68.7842], [-38.9516, -68.0591]]\
-      \},\
-      \{\
-        day: 10,\
-        date: "S\'e1b 10 Ene",\
-        name: "Neuqu\'e9n \uc0\u10132  General Acha",\
-        routeInfo: "RN 151 y RP 20 (Desierto)",\
-        surface: "Asfalto",\
-        defaultColor: "#10b981",\
-        points: [[-38.9516, -68.0591], [-37.7719, -67.7161], [-37.5833, -66.6500], [-37.3770, -64.6043]]\
-      \},\
-      \{\
-        day: 11,\
-        date: "Dom 11 Ene",\
-        name: "General Acha \uc0\u10132  CABA",\
-        routeInfo: "RN 5 Centro Pampeano",\
-        surface: "Asfalto",\
-        defaultColor: "#10b981",\
-        points: [[-37.3770, -64.6043], [-36.6204, -64.2906], [-35.9750, -62.7347], [-34.6037, -58.3816]]\
-      \}\
-    ];\
-\
-    // 2. Estaciones de combustible clave\
-    const fuelStations = [\
-      \{ name: "YPF Valcheta", corridor: "RN 23", coords: [-40.7107, -66.1558], mandatory: true, alert: "Carga preventiva al ingresar a RN 23." \},\
-      \{ name: "YPF Ramos Mex\'eda", corridor: "RN 23", coords: [-40.5756, -67.2478], mandatory: false, alert: "Estaci\'f3n peque\'f1a. Posta intermedia." \},\
-      \{ name: "YPF Los Menucos", corridor: "RN 23", coords: [-40.8443, -68.1465], mandatory: true, alert: "Noche de posta. Llenar tanque al arribar." \},\
-      \{ name: "YPF Ing. Jacobacci", corridor: "RN 23", coords: [-41.3283, -69.5894], mandatory: true, alert: "\'daltima estaci\'f3n antes del tramo Bariloche (~200 km)." \},\
-      \{ name: "Comallo (Puesto)", corridor: "RN 23", coords: [-41.0333, -70.2667], mandatory: false, alert: "Auxilio disponible si la autonom\'eda es cr\'edtica." \},\
-      \{ name: "YPF Piedra del \'c1guila", corridor: "RN 237", coords: [-40.0461, -70.0768], mandatory: true, alert: "Punto central entre Bariloche y Neuqu\'e9n." \},\
-      \{ name: "YPF Villa El Choc\'f3n", corridor: "RN 237", coords: [-39.2625, -68.7842], mandatory: false, alert: "Carga antes de Neuqu\'e9n Capital." \},\
-      \{ name: "YPF Catriel", corridor: "RN 151", coords: [-37.8767, -67.7947], mandatory: false, alert: "Antes de ingresar a La Pampa." \},\
-      \{ name: "YPF/Shell 25 de Mayo", corridor: "RP 20", coords: [-37.7719, -67.7161], mandatory: true, alert: "OBLIGATORIO: Comienzo de la Ruta del Desierto." \},\
-      \{ name: "Pampa Petrol Chacharramendi", corridor: "RP 20", coords: [-37.5833, -66.6500], mandatory: true, alert: "OBLIGATORIO: Parador en medio del desierto pampeano." \},\
-      \{ name: "YPF General Acha", corridor: "RN 152", coords: [-37.3770, -64.6043], mandatory: true, alert: "Fin del desierto pampeano." \}\
-    ];\
-\
-    // 3. Inicializaci\'f3n del Mapa\
-    const map = L.map('map').setView([-39.0, -65.0], 6);\
-\
-    L.tileLayer('https://\{s\}.basemaps.cartocdn.com/rastertiles/dark_all/\{z\}/\{x\}/\{y\}\{r\}.png', \{\
-      attribution: '&copy; OpenStreetMap &copy; CARTO',\
-      subdomains: 'abcd',\
-      maxZoom: 18\
-    \}).addTo(map);\
-\
-    let polylineLayers = [];\
-    let fuelMarkersGroup = L.layerGroup().addTo(map);\
-    let allPoints = [];\
-    let fuelVisible = true;\
-\
-    // 4. Marcadores de combustible\
-    function renderFuelStations() \{\
-      fuelStations.forEach(s => \{\
-        const icon = L.divIcon(\{\
-          className: '',\
-          html: `<div class="fuel-marker-icon $\{s.mandatory ? 'danger' : ''\}" style="width:26px; height:26px;">\uc0\u9981 </div>`,\
-          iconSize: [26, 26],\
-          iconAnchor: [13, 13]\
-        \});\
-\
-        const marker = L.marker(s.coords, \{ icon: icon \});\
-        marker.bindPopup(`\
-          <div style="font-size:13px;">\
-            <strong style="color: $\{s.mandatory ? '#ef4444' : '#fbbf24'\};">$\{s.mandatory ? '\uc0\u55357 \u57000  CARGA OBLIGATORIA' : '\u8505 \u65039  POSTA ESTRAT\'c9GICA'\}</strong><br>\
-            <h4 style="margin:4px 0;">$\{s.name\}</h4>\
-            <p style="color:#94a3b8; font-size:11px;">$\{s.corridor\}</p>\
-            <p style="color:#cbd5e1; font-size:12px; margin-top:4px;">$\{s.alert\}</p>\
-          </div>\
-        `);\
-        fuelMarkersGroup.addLayer(marker);\
-      \});\
-    \}\
-\
-    // 5. Petici\'f3n a OSRM para ruteo real\
-    async function fetchRealRoute(coords) \{\
-      const coordString = coords.map(c => `$\{c[1]\},$\{c[0]\}`).join(';');\
-      const url = `https://router.project-osrm.org/route/v1/driving/$\{coordString\}?overview=full&geometries=geojson`;\
-      try \{\
-        const response = await fetch(url);\
-        const data = await response.json();\
-        if (data.routes && data.routes.length > 0) \{\
-          const route = data.routes[0];\
-          return \{\
-            latLngs: route.geometry.coordinates.map(c => [c[1], c[0]]),\
-            distanceKm: Math.round(route.distance / 1000),\
-            durationHours: (route.duration / 3600).toFixed(1)\
-          \};\
-        \}\
-      \} catch (e) \{\
-        console.warn("Fallo de ruteo OSRM:", e);\
-      \}\
-      return \{ latLngs: coords, distanceKm: 350, durationHours: "5.0" \};\
-    \}\
-\
-    // 6. C\'e1lculo din\'e1mico de autonom\'eda\
-    function getSafeAutonomy() \{\
-      const tank = parseFloat(document.getElementById('tankLiters').value) || 16;\
-      const kmPerL = parseFloat(document.getElementById('kmPerLiter').value) || 20;\
-      // Autonom\'eda te\'f3rica menos un 10% de margen de seguridad/reserva\
-      return Math.round((tank * kmPerL) * 0.90);\
-    \}\
-\
-    function updateAutonomy() \{\
-      const safeAutonomy = getSafeAutonomy();\
-      document.getElementById('safeAutonomyDisplay').innerText = `~$\{safeAutonomy\} km`;\
-\
-      stages.forEach(stage => \{\
-        const card = document.getElementById(`card-$\{stage.day\}`);\
-        const tag = document.getElementById(`tag-$\{stage.day\}`);\
-        const pObj = polylineLayers.find(p => p.day === stage.day);\
-\
-        const exceeds = stage.distanceKm > safeAutonomy;\
-        stage.exceedsAutonomy = exceeds;\
-\
-        if (card && tag) \{\
-          if (exceeds) \{\
-            card.classList.add('warning-danger');\
-            tag.classList.add('danger');\
-            tag.innerText = `$\{stage.distanceKm\} km (+$\{stage.distanceKm - safeAutonomy\} km)`;\
-          \} else \{\
-            card.classList.remove('warning-danger');\
-            tag.classList.remove('danger');\
-            tag.innerText = `$\{stage.distanceKm\} km`;\
-          \}\
-        \}\
-\
-        if (pObj && pObj.line) \{\
-          pObj.line.setStyle(\{\
-            color: exceeds ? '#ef4444' : stage.defaultColor,\
-            dashArray: exceeds ? '8, 8' : null // L\'ednea punteada en tramos de alerta\
-          \});\
-        \}\
-      \});\
-    \}\
-\
-    // 7. Carga inicial del itinerario\
-    async function loadRoutes() \{\
-      const listContainer = document.getElementById('daysList');\
-      renderFuelStations();\
-\
-      for (let i = 0; i < stages.length; i++) \{\
-        const stage = stages[i];\
-        const routeData = await fetchRealRoute(stage.points);\
-        stage.latLngs = routeData.latLngs;\
-        stage.distanceKm = routeData.distanceKm;\
-        stage.durationHours = routeData.durationHours;\
-\
-        const line = L.polyline(routeData.latLngs, \{\
-          color: stage.defaultColor,\
-          weight: 4,\
-          opacity: 0.9\
-        \}).addTo(map);\
-\
-        line.bindPopup(`<b>D\'eda $\{stage.day\}: $\{stage.name\}</b><br>$\{stage.routeInfo\}<br>Distancia: ~$\{stage.distanceKm\} km`);\
-        polylineLayers.push(\{ day: stage.day, line: line, bounds: line.getBounds() \});\
-\
-        const endCoord = stage.points[stage.points.length - 1];\
-        L.circleMarker(endCoord, \{\
-          radius: 5,\
-          fillColor: stage.defaultColor,\
-          color: "#fff",\
-          weight: 1.5,\
-          fillOpacity: 1\
-        \}).addTo(map);\
-\
-        allPoints.push(...stage.points);\
-\
-        const card = document.createElement('div');\
-        card.className = 'day-card';\
-        card.id = `card-$\{stage.day\}`;\
-        card.innerHTML = `\
-          <div class="day-header">\
-            <span class="day-date">D\'eda $\{stage.day\} \'95 $\{stage.date\}</span>\
-            <span class="day-tag" id="tag-$\{stage.day\}">$\{stage.distanceKm\} km</span>\
-          </div>\
-          <div class="day-title">$\{stage.name\}</div>\
-          <div class="day-stats">\
-            <span>\uc0\u9201 \u65039  ~$\{stage.durationHours\} h</span>\
-            <span>\uc0\u55357 \u57059 \u65039  $\{stage.surface\}</span>\
-            <span>\uc0\u55357 \u56525  $\{stage.routeInfo\}</span>\
-          </div>\
-        `;\
-        card.onclick = () => focusDay(stage.day);\
-        listContainer.appendChild(card);\
-      \}\
-\
-      // Aplicar c\'e1lculo inicial\
-      updateAutonomy();\
-    \}\
-\
-    function toggleFuelLayer() \{\
-      const btn = document.getElementById('btnToggleFuel');\
-      if (fuelVisible) \{\
-        map.removeLayer(fuelMarkersGroup);\
-        btn.classList.remove('active');\
-        btn.innerText = "\uc0\u9981  Nafta (OFF)";\
-      \} else \{\
-        map.addLayer(fuelMarkersGroup);\
-        btn.classList.add('active');\
-        btn.innerText = "\uc0\u9981  Nafta (ON)";\
-      \}\
-      fuelVisible = !fuelVisible;\
-    \}\
-\
-    function focusDay(day) \{\
-      document.querySelectorAll('.day-card').forEach(c => c.classList.remove('active'));\
-      const card = document.getElementById(`card-$\{day\}`);\
-      if (card) card.classList.add('active');\
-\
-      const safeAutonomy = getSafeAutonomy();\
-\
-      polylineLayers.forEach(p => \{\
-        const stage = stages.find(s => s.day === p.day);\
-        const exceeds = stage.distanceKm > safeAutonomy;\
-\
-        if (p.day === day) \{\
-          p.line.setStyle(\{ weight: 7, opacity: 1 \});\
-          p.line.bringToFront();\
-          map.fitBounds(p.bounds, \{ padding: [50, 50] \});\
-        \} else \{\
-          p.line.setStyle(\{\
-            weight: 3,\
-            opacity: 0.35,\
-            color: exceeds ? '#ef4444' : stage.defaultColor\
-          \});\
-        \}\
-      \});\
-    \}\
-\
-    function resetView() \{\
-      map.fitBounds(L.latLngBounds(allPoints), \{ padding: [40, 40] \});\
-      updateAutonomy();\
-      document.querySelectorAll('.day-card').forEach(c => c.classList.remove('active'));\
-    \}\
-\
-    function exportGPX() \{\
-      let gpx = `<?xml version="1.0" encoding="UTF-8"?>\
-<gpx version="1.1" creator="RutaMotoPro" xmlns="http://www.topografix.com/GPX/1/1">\
-<metadata><name>Buenos Aires - Las Grutas - Bariloche + Waypoints Nafta</name></metadata>`;\
-\
-      fuelStations.forEach(s => \{\
-        gpx += `\\n<wpt lat="$\{s.coords[0]\}" lon="$\{s.coords[1]\}"><name>GAS: $\{s.name\}</name><desc>$\{s.alert\}</desc></wpt>`;\
-      \});\
-\
-      stages.forEach(stage => \{\
-        if (stage.latLngs) \{\
-          gpx += `\\n<trk><name>D\'eda $\{stage.day\}: $\{stage.name\}</name><trkseg>`;\
-          stage.latLngs.forEach(c => \{\
-            gpx += `\\n  <trkpt lat="$\{c[0]\}" lon="$\{c[1]\}"></trkpt>`;\
-          \});\
-          gpx += `\\n</trkseg></trk>`;\
-        \}\
-      \});\
-      gpx += `\\n</gpx>`;\
-\
-      const blob = new Blob([gpx], \{ type: 'application/gpx+xml' \});\
-      const url = URL.createObjectURL(blob);\
-      const a = document.createElement('a');\
-      a.href = url;\
-      a.download = 'circuito_patagonico_autonomia.gpx';\
-      a.click();\
-      URL.revokeObjectURL(url);\
-    \}\
-\
-    loadRoutes();\
-  </script>\
-</body>\
-</html>\
-}
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json" />
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <style>
+    :root {
+      --bg-main: #0b1120;
+      --bg-surface: #1e293b;
+      --bg-card: #182234;
+      --border: #334155;
+      --accent: #38bdf8;
+      --accent-hover: #0284c7;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --success: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      display: flex;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      background: var(--bg-main);
+      color: #f8fafc;
+    }
+
+    /* BARRA LATERAL (Desktop) */
+    #sidebar {
+      width: 420px;
+      min-width: 360px;
+      height: 100%;
+      background: var(--bg-surface);
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--border);
+      z-index: 1000;
+      transition: transform 0.3s ease;
+    }
+
+    #map-container {
+      flex: 1;
+      height: 100%;
+      position: relative;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+      background: #0f172a;
+    }
+
+    /* HEADER */
+    .header {
+      padding: 16px;
+      background: var(--bg-main);
+      border-bottom: 1px solid var(--border);
+    }
+    .header h1 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #f8fafc;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .header p {
+      font-size: 0.76rem;
+      color: #94a3b8;
+      margin-top: 3px;
+    }
+
+    /* CALCULADORA DE AUTONOMÍA */
+    .calc-card {
+      margin: 12px 14px 6px 14px;
+      padding: 12px;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+    .calc-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+    .calc-inputs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .calc-field label {
+      display: block;
+      font-size: 0.68rem;
+      color: #94a3b8;
+      margin-bottom: 3px;
+    }
+    .calc-field input {
+      width: 100%;
+      background: #1e293b;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 8px;
+      color: white;
+      font-size: 0.85rem;
+      font-weight: 600;
+      outline: none;
+    }
+    .calc-field input:focus {
+      border-color: var(--accent);
+    }
+    .calc-result {
+      margin-top: 8px;
+      padding-top: 6px;
+      border-top: 1px solid #334155;
+      font-size: 0.72rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .calc-result strong {
+      color: var(--success);
+      font-size: 0.85rem;
+    }
+
+    /* ACCIONES RÁPIDAS */
+    .actions-bar {
+      display: flex;
+      gap: 6px;
+      padding: 6px 14px 10px 14px;
+    }
+    .btn {
+      flex: 1;
+      padding: 8px 10px;
+      background: #334155;
+      border: none;
+      color: #f8fafc;
+      font-size: 0.72rem;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 5px;
+      transition: background 0.2s;
+    }
+    .btn:hover { background: #475569; }
+    .btn-primary { background: #0284c7; }
+    .btn-primary:hover { background: #0369a1; }
+    .btn-fuel.active { background: #ea580c; }
+
+    /* LISTA DE DÍAS */
+    .days-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 4px 14px 14px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .day-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      cursor: pointer;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+      position: relative;
+    }
+    .day-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+    .day-card.active {
+      border-color: var(--accent);
+      background: #1c2e4a;
+      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.4);
+    }
+    .day-card.danger {
+      border-color: var(--danger) !important;
+      background: rgba(239, 68, 68, 0.15) !important;
+    }
+    .day-badge-danger {
+      display: none;
+      font-size: 0.65rem;
+      font-weight: 800;
+      background: var(--danger);
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .day-card.danger .day-badge-danger {
+      display: inline-block;
+    }
+
+    .day-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    .day-date {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #93c5fd;
+    }
+    .day-km {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: #064e3b;
+      color: #6ee7b7;
+    }
+    .day-km.danger {
+      background: #7f1d1d;
+      color: #fca5a5;
+    }
+    .day-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #f1f5f9;
+      margin-bottom: 6px;
+    }
+    .day-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: 0.72rem;
+      color: #94a3b8;
+      border-top: 1px solid rgba(51, 65, 85, 0.6);
+      padding-top: 6px;
+    }
+
+    /* ÍCONOS DE MAPA PERSONALIZADOS */
+    .fuel-marker {
+      background: #ea580c;
+      border: 2px solid #ffffff;
+      border-radius: 50%;
+      color: white;
+      text-align: center;
+      line-height: 24px;
+      font-size: 13px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.6);
+    }
+    .fuel-marker.critical {
+      background: #dc2626;
+      animation: pulse 1.8s infinite;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.8); }
+      70% { box-shadow: 0 0 0 8px rgba(220, 38, 38, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+    }
+
+    /* BARRA DE NAVEGACIÓN INFERIOR (Solo Celular) */
+    .mobile-tab-bar {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 54px;
+      background: #0b1120;
+      border-top: 1px solid var(--border);
+      z-index: 2000;
+      grid-template-columns: 1fr 1fr;
+    }
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      font-size: 0.8rem;
+      font-weight: 700;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      cursor: pointer;
+    }
+    .tab-btn.active {
+      color: var(--accent);
+      background: rgba(56, 189, 248, 0.1);
+    }
+
+    /* RESPONSIVE DESIGN (Pantallas menores a 768px) */
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+      .mobile-tab-bar {
+        display: grid;
+      }
+      #sidebar {
+        width: 100%;
+        min-width: 100%;
+        height: calc(100dvh - 54px);
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 1500;
+        border-right: none;
+      }
+      #sidebar.hidden-mobile {
+        transform: translateY(100%);
+        pointer-events: none;
+      }
+      #map-container {
+        height: calc(100dvh - 54px);
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BARRA LATERAL -->
+  <div id="sidebar">
+    <div class="header">
+      <h1>🏍️ Circuito Patagónico</h1>
+      <p>Buenos Aires ➔ Las Grutas ➔ Bariloche ➔ CABA</p>
+    </div>
+
+    <!-- CALCULADORA DE AUTONOMÍA -->
+    <div class="calc-card">
+      <div class="calc-title">⚙️ Autonomía de tu Moto</div>
+      <div class="calc-inputs">
+        <div class="calc-field">
+          <label for="tankLiters">Tanque (Litros)</label>
+          <input type="number" id="tankLiters" value="16" min="5" max="45" step="0.5" oninput="updateAutonomy()" />
+        </div>
+        <div class="calc-field">
+          <label for="kmPerLiter">Consumo (km / L)</label>
+          <input type="number" id="kmPerLiter" value="20" min="5" max="40" step="0.5" oninput="updateAutonomy()" />
+        </div>
+      </div>
+      <div class="calc-result">
+        <span>Autonomía segura (-10% reserva):</span>
+        <strong id="autonomyDisplay">~288 km</strong>
+      </div>
+    </div>
+
+    <!-- BOTONERA DE ACCIÓN -->
+    <div class="actions-bar">
+      <button class="btn btn-fuel active" id="btnToggleFuel" onclick="toggleFuelLayer()">⛽ Nafta (ON)</button>
+      <button class="btn btn-primary" onclick="exportGPX()">📥 Bajar GPX</button>
+      <button class="btn" onclick="resetView()">🔄 Total</button>
+    </div>
+
+    <!-- LISTA DE ETAPAS -->
+    <div class="days-list" id="daysList"></div>
+  </div>
+
+  <!-- MAPA PRINCIPAL -->
+  <div id="map-container">
+    <div id="map"></div>
+  </div>
+
+  <!-- BOTONES INFERIORES EN CELULAR -->
+  <div class="mobile-tab-bar">
+    <button class="tab-btn" id="tabMapBtn" onclick="switchMobileView('map')">
+      🗺️ Ver Mapa
+    </button>
+    <button class="tab-btn active" id="tabListBtn" onclick="switchMobileView('list')">
+      📋 Itinerario / Ficha
+    </button>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <script>
+    const stages = [
+      { day: 1, date: "Jue 1 Ene", name: "CABA ➔ Olavarría", routeInfo: "RN 3 y RP 51", surface: "Asfalto", color: "#38bdf8", points: [[-34.6037, -58.3816], [-35.4385, -58.8058], [-36.0157, -59.0975], [-36.8927, -60.3225]] },
+      { day: 2, date: "Vie 2 Ene", name: "Olavarría ➔ Médanos", routeInfo: "RN 3 y RN 22", surface: "Asfalto", color: "#38bdf8", points: [[-36.8927, -60.3225], [-38.3756, -60.2798], [-38.7196, -62.2724], [-38.8267, -62.6936]] },
+      { day: 3, date: "Sáb 3 Ene", name: "Médanos ➔ Las Grutas", routeInfo: "RN 3 Sur", surface: "Asfalto", color: "#38bdf8", points: [[-38.8267, -62.6936], [-40.8037, -62.9967], [-40.8094, -65.0931]] },
+      { day: 5, date: "Lun 5 Ene", name: "Las Grutas ➔ Los Menucos", routeInfo: "RN 23 (Estepa)", surface: "Asfalto", color: "#f59e0b", points: [[-40.8094, -65.0931], [-40.7107, -66.1558], [-40.6657, -67.7552], [-40.8443, -68.1465]] },
+      { day: 6, date: "Mar 6 Ene", name: "Los Menucos ➔ Bariloche", routeInfo: "RN 23 (Precaución obras)", surface: "Asfalto / Desvíos", color: "#f59e0b", points: [[-40.8443, -68.1465], [-41.3283, -69.5894], [-41.0333, -70.2667], [-41.1335, -71.3103]] },
+      { day: 9, date: "Vie 9 Ene", name: "Bariloche ➔ Neuquén", routeInfo: "RN 237 (Valle Encantado)", surface: "Asfalto", color: "#10b981", points: [[-41.1335, -71.3103], [-40.0461, -70.0768], [-39.2625, -68.7842], [-38.9516, -68.0591]] },
+      { day: 10, date: "Sáb 10 Ene", name: "Neuquén ➔ General Acha", routeInfo: "RN 151 y RP 20 (Desierto)", surface: "Asfalto", color: "#10b981", points: [[-38.9516, -68.0591], [-37.7719, -67.7161], [-37.5833, -66.6500], [-37.3770, -64.6043]] },
+      { day: 11, date: "Dom 11 Ene", name: "General Acha ➔ CABA", routeInfo: "RN 5 Centro Pampeano", surface: "Asfalto", color: "#10b981", points: [[-37.3770, -64.6043], [-36.6204, -64.2906], [-35.9750, -62.7347], [-34.6037, -58.3816]] }
+    ];
+
+    const fuelStations = [
+      { name: "YPF Valcheta", corridor: "RN 23", coords: [-40.7107, -66.1558], mandatory: true, alert: "Carga preventiva entrando a la RN 23." },
+      { name: "YPF Ramos Mexía", corridor: "RN 23", coords: [-40.5756, -67.2478], mandatory: false, alert: "Posta intermedia en la estepa." },
+      { name: "YPF Los Menucos", corridor: "RN 23", coords: [-40.8443, -68.1465], mandatory: true, alert: "Noche de posta. Llenar tanque al arribar." },
+      { name: "YPF Ing. Jacobacci", corridor: "RN 23", coords: [-41.3283, -69.5894], mandatory: true, alert: "Última estación antes del tramo de obras a Bariloche." },
+      { name: "Comallo (Puesto)", corridor: "RN 23", coords: [-41.0333, -70.2667], mandatory: false, alert: "Punto de emergencia si escasea nafta." },
+      { name: "YPF Piedra del Águila", corridor: "RN 237", coords: [-40.0461, -70.0768], mandatory: true, alert: "Punto neurálgico Bariloche - Neuquén." },
+      { name: "YPF Villa El Chocón", corridor: "RN 237", coords: [-39.2625, -68.7842], mandatory: false, alert: "Carga previa al Gran Neuquén." },
+      { name: "YPF Catriel", corridor: "RN 151", coords: [-37.8767, -67.7947], mandatory: false, alert: "Límite Río Negro / La Pampa." },
+      { name: "YPF / Shell 25 de Mayo", corridor: "RP 20", coords: [-37.7719, -67.7161], mandatory: true, alert: "CARGA OBLIGATORIA: Inicio de la Ruta del Desierto." },
+      { name: "Pampa Petrol Chacharramendi", corridor: "RP 20", coords: [-37.5833, -66.6500], mandatory: true, alert: "CARGA OBLIGATORIA: Oasis a mitad del desierto." },
+      { name: "YPF General Acha", corridor: "RN 152", coords: [-37.3770, -64.6043], mandatory: true, alert: "Fin de la travesía del desierto." }
+    ];
+
+    // INICIALIZACIÓN LEAFLET
+    const map = L.map('map', { zoomControl: false }).setView([-39.0, -65.0], 6);
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; OpenStreetMap &copy; CARTO',
+      subdomains: 'abcd',
+      maxZoom: 18
+    }).addTo(map);
+
+    let polylineLayers = [];
+    let fuelGroup = L.layerGroup().addTo(map);
+    let allPoints = [];
+    let fuelVisible = true;
+
+    function renderFuel() {
+      fuelStations.forEach(s => {
+        const icon = L.divIcon({
+          className: '',
+          html: `<div class="fuel-marker ${s.mandatory ? 'critical' : ''}" style="width:24px;height:24px;">⛽</div>`,
+          iconSize: [24, 24],
+          iconAnchor: [12, 12]
+        });
+        const m = L.marker(s.coords, { icon: icon }).bindPopup(`
+          <div style="font-size:12px;color:#f8fafc;padding:2px;">
+            <strong style="color:${s.mandatory ? '#ef4444' : '#fbbf24'};">${s.mandatory ? '🚨 OBLIGATORIO' : 'ℹ️ POSTA'}</strong><br>
+            <b>${s.name}</b> (${s.corridor})<br>
+            <span style="color:#94a3b8;">${s.alert}</span>
+          </div>
+        `);
+        fuelGroup.addLayer(m);
+      });
+    }
+
+    async function fetchRealRoute(coords) {
+      const coordStr = coords.map(c => `${c[1]},${c[0]}`).join(';');
+      const url = `https://router.project-osrm.org/route/v1/driving/${coordStr}?overview=full&geometries=geojson`;
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data.routes && data.routes.length > 0) {
+          const r = data.routes[0];
+          return {
+            latLngs: r.geometry.coordinates.map(c => [c[1], c[0]]),
+            km: Math.round(r.distance / 1000),
+            hours: (r.duration / 3600).toFixed(1)
+          };
+        }
+      } catch (e) {
+        console.warn("Fallo OSRM:", e);
+      }
+      return { latLngs: coords, km: 350, hours: "4.5" };
+    }
+
+    function getSafeRange() {
+      const tank = parseFloat(document.getElementById('tankLiters').value) || 16;
+      const kml = parseFloat(document.getElementById('kmPerLiter').value) || 20;
+      return Math.round((tank * kml) * 0.90);
+    }
+
+    function updateAutonomy() {
+      const range = getSafeRange();
+      document.getElementById('autonomyDisplay').innerText = `~${range} km`;
+
+      stages.forEach(s => {
+        const card = document.getElementById(`card-${s.day}`);
+        const kmEl = document.getElementById(`km-${s.day}`);
+        const p = polylineLayers.find(pl => pl.day === s.day);
+        const exceeds = s.distanceKm > range;
+
+        if (card && kmEl) {
+          if (exceeds) {
+            card.classList.add('danger');
+            kmEl.classList.add('danger');
+            kmEl.innerText = `${s.distanceKm} km (+${s.distanceKm - range} km)`;
+          } else {
+            card.classList.remove('danger');
+            kmEl.classList.remove('danger');
+            kmEl.innerText = `${s.distanceKm} km`;
+          }
+        }
+        if (p && p.line) {
+          p.line.setStyle({
+            color: exceeds ? '#ef4444' : s.color,
+            dashArray: exceeds ? '6, 6' : null
+          });
+        }
+      });
+    }
+
+    async function init() {
+      renderFuel();
+      const list = document.getElementById('daysList');
+
+      for (const s of stages) {
+        const routeData = await fetchRealRoute(s.points);
+        s.latLngs = routeData.latLngs;
+        s.distanceKm = routeData.km;
+        s.durationHours = routeData.hours;
+
+        const line = L.polyline(routeData.latLngs, {
+          color: s.color,
+          weight: 4,
+          opacity: 0.85
+        }).addTo(map);
+
+        polylineLayers.push({ day: s.day, line: line, bounds: line.getBounds() });
+        allPoints.push(...s.points);
+
+        const card = document.createElement('div');
+        card.className = 'day-card';
+        card.id = `card-${s.day}`;
+        card.innerHTML = `
+          <div class="day-header">
+            <span class="day-date">Día ${s.day} • ${s.date}</span>
+            <span class="day-badge-danger">SUPERA AUTONOMÍA</span>
+            <span class="day-km" id="km-${s.day}">${s.distanceKm} km</span>
+          </div>
+          <div class="day-title">${s.name}</div>
+          <div class="day-meta">
+            <span>⏱️ ~${s.durationHours} h</span>
+            <span>🛣️ ${s.surface}</span>
+            <span>📍 ${s.routeInfo}</span>
+          </div>
+        `;
+        card.onclick = () => focusDay(s.day);
+        list.appendChild(card);
+      }
+
+      updateAutonomy();
+      map.invalidateSize();
+    }
+
+    function focusDay(day) {
+      document.querySelectorAll('.day-card').forEach(c => c.classList.remove('active'));
+      const c = document.getElementById(`card-${day}`);
+      if (c) c.classList.add('active');
+
+      const safe = getSafeRange();
+      polylineLayers.forEach(p => {
+        const s = stages.find(st => st.day === p.day);
+        const exceeds = s.distanceKm > safe;
+        if (p.day === day) {
+          p.line.setStyle({ weight: 7, opacity: 1 });
+          p.line.bringToFront();
+          map.fitBounds(p.bounds, { padding: [40, 40] });
+        } else {
+          p.line.setStyle({ weight: 3, opacity: 0.3, color: exceeds ? '#ef4444' : s.color });
+        }
+      });
+
+      // Si está en celular, cambiar la vista al mapa automáticamente al elegir un tramo
+      if (window.innerWidth <= 768) {
+        switchMobileView('map');
+      }
+    }
+
+    function resetView() {
+      map.fitBounds(L.latLngBounds(allPoints), { padding: [30, 30] });
+      updateAutonomy();
+      document.querySelectorAll('.day-card').forEach(c => c.classList.remove('active'));
+    }
+
+    function toggleFuelLayer() {
+      const btn = document.getElementById('btnToggleFuel');
+      if (fuelVisible) {
+        map.removeLayer(fuelGroup);
+        btn.classList.remove('active');
+        btn.innerText = "⛽ Nafta (OFF)";
+      } else {
+        map.addLayer(fuelGroup);
+        btn.classList.add('active');
+        btn.innerText = "⛽ Nafta (ON)";
+      }
+      fuelVisible = !fuelVisible;
+    }
+
+    function switchMobileView(view) {
+      const sidebar = document.getElementById('sidebar');
+      const tabMap = document.getElementById('tabMapBtn');
+      const tabList = document.getElementById('tabListBtn');
+
+      if (view === 'map') {
+        sidebar.classList.add('hidden-mobile');
+        tabMap.classList.add('active');
+        tabList.classList.remove('active');
+        setTimeout(() => map.invalidateSize(), 300);
+      } else {
+        sidebar.classList.remove('hidden-mobile');
+        tabMap.classList.remove('active');
+        tabList.classList.add('active');
+      }
+    }
+
+    function exportGPX() {
+      let gpx = `<?xml version="1.0" encoding="UTF-8"?><gpx version="1.1" creator="RutaPatagonia" xmlns="http://www.topografix.com/GPX/1/1"><metadata><name>Circuito Patagonico</name></metadata>`;
+      fuelStations.forEach(s => {
+        gpx += `\n<wpt lat="${s.coords[0]}" lon="${s.coords[1]}"><name>GAS: ${s.name}</name><desc>${s.alert}</desc></wpt>`;
+      });
+      stages.forEach(s => {
+        if (s.latLngs) {
+          gpx += `\n<trk><name>Día ${s.day}: ${s.name}</name><trkseg>`;
+          s.latLngs.forEach(c => { gpx += `\n  <trkpt lat="${c[0]}" lon="${c[1]}"></trkpt>`; });
+          gpx += `\n</trkseg></trk>`;
+        }
+      });
+      gpx += `\n</gpx>`;
+      const blob = new Blob([gpx], { type: 'application/gpx+xml' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'ruta_patagonia_completa.gpx';
+      a.click();
+    }
+
+    window.addEventListener('resize', () => map.invalidateSize());
+    init();
+  </script>
+</body>
+</html>
