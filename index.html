@@ -8,7 +8,6 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-  <!-- PWA Manifest -->
   <link rel="manifest" href="manifest.json" />
 
   <!-- Leaflet CSS -->
@@ -21,9 +20,7 @@
       --bg-card: #182234;
       --border: #334155;
       --accent: #38bdf8;
-      --accent-hover: #0284c7;
       --danger: #ef4444;
-      --warning: #f59e0b;
       --success: #10b981;
     }
 
@@ -31,7 +28,7 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       -webkit-tap-highlight-color: transparent;
     }
 
@@ -44,7 +41,6 @@
       color: #f8fafc;
     }
 
-    /* BARRA LATERAL (Desktop) */
     #sidebar {
       width: 420px;
       min-width: 360px;
@@ -69,7 +65,11 @@
       background: #0f172a;
     }
 
-    /* HEADER */
+    /* Filtro oscuro para que el mapa libre coincida con el modo oscuro */
+    .dark-map-tiles {
+      filter: brightness(0.65) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.75);
+    }
+
     .header {
       padding: 16px;
       background: var(--bg-main);
@@ -89,7 +89,6 @@
       margin-top: 3px;
     }
 
-    /* CALCULADORA DE AUTONOMÍA */
     .calc-card {
       margin: 12px 14px 6px 14px;
       padding: 12px;
@@ -144,7 +143,6 @@
       font-size: 0.85rem;
     }
 
-    /* ACCIONES RÁPIDAS */
     .actions-bar {
       display: flex;
       gap: 6px;
@@ -168,10 +166,8 @@
     }
     .btn:hover { background: #475569; }
     .btn-primary { background: #0284c7; }
-    .btn-primary:hover { background: #0369a1; }
     .btn-fuel.active { background: #ea580c; }
 
-    /* LISTA DE DÍAS */
     .days-list {
       flex: 1;
       overflow-y: auto;
@@ -254,7 +250,6 @@
       padding-top: 6px;
     }
 
-    /* ÍCONOS DE MAPA PERSONALIZADOS */
     .fuel-marker {
       background: #ea580c;
       border: 2px solid #ffffff;
@@ -275,7 +270,6 @@
       100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
     }
 
-    /* BARRA DE NAVEGACIÓN INFERIOR (Solo Celular) */
     .mobile-tab-bar {
       display: none;
       position: fixed;
@@ -306,7 +300,6 @@
       background: rgba(56, 189, 248, 0.1);
     }
 
-    /* RESPONSIVE DESIGN (Pantallas menores a 768px) */
     @media (max-width: 768px) {
       body {
         flex-direction: column;
@@ -337,14 +330,12 @@
 </head>
 <body>
 
-  <!-- BARRA LATERAL -->
   <div id="sidebar">
     <div class="header">
       <h1>🏍️ Circuito Patagónico</h1>
       <p>Buenos Aires ➔ Las Grutas ➔ Bariloche ➔ CABA</p>
     </div>
 
-    <!-- CALCULADORA DE AUTONOMÍA -->
     <div class="calc-card">
       <div class="calc-title">⚙️ Autonomía de tu Moto</div>
       <div class="calc-inputs">
@@ -363,23 +354,19 @@
       </div>
     </div>
 
-    <!-- BOTONERA DE ACCIÓN -->
     <div class="actions-bar">
       <button class="btn btn-fuel active" id="btnToggleFuel" onclick="toggleFuelLayer()">⛽ Nafta (ON)</button>
       <button class="btn btn-primary" onclick="exportGPX()">📥 Bajar GPX</button>
       <button class="btn" onclick="resetView()">🔄 Total</button>
     </div>
 
-    <!-- LISTA DE ETAPAS -->
     <div class="days-list" id="daysList"></div>
   </div>
 
-  <!-- MAPA PRINCIPAL -->
   <div id="map-container">
     <div id="map"></div>
   </div>
 
-  <!-- BOTONES INFERIORES EN CELULAR -->
   <div class="mobile-tab-bar">
     <button class="tab-btn" id="tabMapBtn" onclick="switchMobileView('map')">
       🗺️ Ver Mapa
@@ -389,7 +376,6 @@
     </button>
   </div>
 
-  <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <script>
@@ -418,13 +404,13 @@
       { name: "YPF General Acha", corridor: "RN 152", coords: [-37.3770, -64.6043], mandatory: true, alert: "Fin de la travesía del desierto." }
     ];
 
-    // INICIALIZACIÓN LEAFLET
+    // MAPA CON OPENSTREETMAP (100% Libre - Sin API Key requerida)
     const map = L.map('map', { zoomControl: false }).setView([-39.0, -65.0], 6);
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; OpenStreetMap &copy; CARTO',
-      subdomains: 'abcd',
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      className: 'dark-map-tiles',
+      attribution: '&copy; OpenStreetMap contributors',
       maxZoom: 18
     }).addTo(map);
 
@@ -442,10 +428,10 @@
           iconAnchor: [12, 12]
         });
         const m = L.marker(s.coords, { icon: icon }).bindPopup(`
-          <div style="font-size:12px;color:#f8fafc;padding:2px;">
-            <strong style="color:${s.mandatory ? '#ef4444' : '#fbbf24'};">${s.mandatory ? '🚨 OBLIGATORIO' : 'ℹ️ POSTA'}</strong><br>
+          <div style="font-size:12px;color:#111827;padding:2px;">
+            <strong style="color:${s.mandatory ? '#dc2626' : '#d97706'};">${s.mandatory ? '🚨 OBLIGATORIO' : 'ℹ️ POSTA'}</strong><br>
             <b>${s.name}</b> (${s.corridor})<br>
-            <span style="color:#94a3b8;">${s.alert}</span>
+            <span style="color:#4b5563;">${s.alert}</span>
           </div>
         `);
         fuelGroup.addLayer(m);
@@ -569,7 +555,6 @@
         }
       });
 
-      // Si está en celular, cambiar la vista al mapa automáticamente al elegir un tramo
       if (window.innerWidth <= 768) {
         switchMobileView('map');
       }
