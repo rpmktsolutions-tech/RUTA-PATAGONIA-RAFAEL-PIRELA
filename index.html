@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <title>MotoRuta Argentina - Planificador Universal</title>
+  <title>MotoRuta Argentina - Selector Exacto</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="theme-color" content="#0b1120" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -88,7 +88,6 @@
       margin-top: 2px;
     }
 
-    /* Pestañas de configuración */
     .drawer {
       overflow-y: auto;
       flex: 1;
@@ -136,7 +135,7 @@
       color: #94a3b8;
       font-weight: 500;
     }
-    .form-group input {
+    .form-group input, .form-group select {
       background: #1e293b;
       border: 1px solid var(--border);
       border-radius: 6px;
@@ -146,7 +145,10 @@
       outline: none;
       transition: border-color 0.2s;
     }
-    .form-group input:focus {
+    .form-group select {
+      cursor: pointer;
+    }
+    .form-group input:focus, .form-group select:focus {
       border-color: var(--accent);
     }
 
@@ -164,7 +166,7 @@
       justify-content: center;
       align-items: center;
       gap: 6px;
-      margin-top: 6px;
+      margin-top: 8px;
       transition: background 0.2s;
     }
     .btn-calc:hover { background: #0369a1; }
@@ -186,7 +188,6 @@
     }
     .badge-info strong { color: var(--accent); }
 
-    /* Tarjetas de Jornadas calculadas */
     .day-card {
       background: var(--bg-card);
       border: 1px solid var(--border);
@@ -252,7 +253,6 @@
       color: #fbbf24;
     }
 
-    /* Marcadores del mapa */
     .custom-icon {
       border: 2px solid white;
       border-radius: 50%;
@@ -264,9 +264,7 @@
     .marker-origin { background: #10b981; line-height: 24px; font-size: 12px; }
     .marker-dest { background: #ef4444; line-height: 24px; font-size: 12px; }
     .marker-rest { background: #0d9488; line-height: 20px; font-size: 10px; }
-    .marker-fuel { background: #f59e0b; line-height: 20px; font-size: 10px; }
 
-    /* Barra inferior mobile */
     .mobile-tab-bar {
       display: none;
       position: fixed;
@@ -326,26 +324,26 @@
   <div id="sidebar">
     <div class="header">
       <h1>🏍️ MotoRuta Argentina</h1>
-      <p>Calculador Universal de Rutas, Autonomía y Etapas</p>
+      <p>Selección Exacta de Rutas, Autonomía y Etapas</p>
     </div>
 
     <div class="drawer">
-      <!-- 1. Trayecto -->
+      <!-- 1. Desplegables de Ciudades Fijas -->
       <div class="panel-box">
-        <div class="panel-title">📍 Origen y Destino</div>
+        <div class="panel-title">📍 Origen y Destino (Argentina)</div>
         <div class="inputs-grid-2">
           <div class="form-group">
-            <label>Origen (Ciudad, Arg)</label>
-            <input type="text" id="inputOrigin" value="Buenos Aires" placeholder="Ej: Rosario" />
+            <label>Ciudad de Origen</label>
+            <select id="selectOrigin"></select>
           </div>
           <div class="form-group">
-            <label>Destino (Ciudad, Arg)</label>
-            <input type="text" id="inputDest" value="San Carlos de Bariloche" placeholder="Ej: Mendoza" />
+            <label>Ciudad de Destino</label>
+            <select id="selectDest"></select>
           </div>
         </div>
       </div>
 
-      <!-- 2. Moto Spec -->
+      <!-- 2. Especificaciones de la Moto -->
       <div class="panel-box">
         <div class="panel-title">⚙️ Datos de la Moto</div>
         <div class="inputs-grid-2" style="margin-bottom: 8px;">
@@ -379,14 +377,14 @@
         </div>
 
         <button class="btn-calc" onclick="planTrip()">
-          🚀 Calcular y Rutear
+          🚀 Trazar Ruta Exacta
         </button>
       </div>
 
-      <!-- 3. Resultados de Etapas -->
+      <!-- 3. Panel de Resultados -->
       <div id="resultsPanel" style="display: none; flex-direction: column; gap: 8px;">
         <div class="panel-title" style="padding: 0 4px;">
-          <span>📋 Itinerario Sugerido</span>
+          <span>📋 Itinerario Calculado</span>
           <span id="tripTotals" style="color: #94a3b8; font-weight: normal; font-size: 0.7rem;"></span>
         </div>
         <div id="stagesList" style="display: flex; flex-direction: column; gap: 8px;"></div>
@@ -406,20 +404,84 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <script>
-    // Inicialización del Mapa con Relieve 3D ESRI Topo
+    // Base de datos de ciudades de Argentina con coordenadas exactas verificadas
+    const ARGENTINA_CITIES = [
+      { name: "Buenos Aires (CABA)", lat: -34.6037, lng: -58.3816 },
+      { name: "Mar del Plata (BA)", lat: -38.0055, lng: -57.5560 },
+      { name: "Bahía Blanca (BA)", lat: -38.7196, lng: -62.2724 },
+      { name: "Olavarría (BA)", lat: -36.8927, lng: -60.3225 },
+      { name: "Tandil (BA)", lat: -37.3217, lng: -59.1332 },
+      { name: "San Carlos de Bariloche (RN)", lat: -41.1335, lng: -71.3103 },
+      { name: "Las Grutas (RN)", lat: -40.8094, lng: -65.0931 },
+      { name: "Viedma (RN)", lat: -40.8135, lng: -62.9967 },
+      { name: "San Martín de los Andes (NQN)", lat: -40.1579, lng: -71.3533 },
+      { name: "Villa La Angostura (NQN)", lat: -40.7634, lng: -71.6433 },
+      { name: "Neuquén Capital (NQN)", lat: -38.9516, lng: -68.0591 },
+      { name: "Santa Rosa (LP)", lat: -36.6204, lng: -64.2906 },
+      { name: "General Acha (LP)", lat: -37.3770, lng: -64.6043 },
+      { name: "25 de Mayo (LP)", lat: -37.7719, lng: -67.7161 },
+      { name: "Córdoba Capital (CBA)", lat: -31.4201, lng: -64.1888 },
+      { name: "Villa Carlos Paz (CBA)", lat: -31.4241, lng: -64.4978 },
+      { name: "Mina Clavero (CBA)", lat: -31.7247, lng: -65.0028 },
+      { name: "Mendoza Capital (MDZ)", lat: -32.8895, lng: -68.8458 },
+      { name: "San Rafael (MDZ)", lat: -34.6177, lng: -68.3301 },
+      { name: "Malargüe (MDZ)", lat: -35.4754, lng: -69.5843 },
+      { name: "Rosario (SF)", lat: -32.9468, lng: -60.6393 },
+      { name: "Santa Fe Capital (SF)", lat: -31.6333, lng: -60.7000 },
+      { name: "San Juan Capital (SJ)", lat: -31.5375, lng: -68.5364 },
+      { name: "San Luis Capital (SL)", lat: -33.2950, lng: -66.3356 },
+      { name: "Merlo (SL)", lat: -32.3433, lng: -65.0125 },
+      { name: "Salta Capital (SLA)", lat: -24.7821, lng: -65.4232 },
+      { name: "Cafayate (SLA)", lat: -26.0731, lng: -65.9761 },
+      { name: "San Salvador de Jujuy (JUY)", lat: -24.1858, lng: -65.2995 },
+      { name: "Purmamarca (JUY)", lat: -23.7461, lng: -65.4989 },
+      { name: "San Miguel de Tucumán (TUC)", lat: -26.8083, lng: -65.2176 },
+      { name: "Tafí del Valle (TUC)", lat: -26.8528, lng: -65.7100 },
+      { name: "Puerto Madryn (CHU)", lat: -42.7692, lng: -65.0385 },
+      { name: "Esquel (CHU)", lat: -42.9115, lng: -71.3195 },
+      { name: "El Calafate (SC)", lat: -50.3379, lng: -72.2648 },
+      { name: "El Chaltén (SC)", lat: -49.3315, lng: -72.8864 },
+      { name: "Ushuaia (TDF)", lat: -54.8019, lng: -68.3030 }
+    ];
+
+    // Cargar opciones en los selectores
+    function populateCitySelectors() {
+      const selectO = document.getElementById('selectOrigin');
+      const selectD = document.getElementById('selectDest');
+
+      selectO.innerHTML = '';
+      selectD.innerHTML = '';
+
+      ARGENTINA_CITIES.forEach((city, index) => {
+        const optO = document.createElement('option');
+        optO.value = index;
+        optO.textContent = city.name;
+        selectO.appendChild(optO);
+
+        const optD = document.createElement('option');
+        optD.value = index;
+        optD.textContent = city.name;
+        selectD.appendChild(optD);
+      });
+
+      // Valores iniciales: Buenos Aires -> Bariloche
+      selectO.value = 0; // Buenos Aires
+      selectD.value = 5; // Bariloche
+    }
+
+    // Inicializar Mapa centrado estrictamente en Argentina
     const map = L.map('map', { zoomControl: false }).setView([-38.4161, -63.6167], 5);
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{x}/{y}', {
+    // Relieve Topográfico 3D
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
       attribution: 'Tiles &copy; Esri, USGS',
       maxZoom: 18
     }).addTo(map);
 
     let routeLayer = null;
     let markersLayer = L.layerGroup().addTo(map);
-    let currentRouteData = null;
 
-    // Estimación automática según cc y potencia
     function autoEstimateSpecs() {
       const cc = parseInt(document.getElementById('inputCc').value) || 300;
       let hp = 25;
@@ -441,7 +503,7 @@
     function calculateAutonomy() {
       const tank = parseFloat(document.getElementById('inputTank').value) || 15;
       const kml = parseFloat(document.getElementById('inputKmL').value) || 20;
-      const safeKm = Math.round((tank * kml) * 0.90); // 10% reserva preventiva
+      const safeKm = Math.round((tank * kml) * 0.90);
       
       const cc = parseInt(document.getElementById('inputCc').value) || 300;
       let cruise = cc > 400 ? 110 : (cc > 200 ? 100 : 85);
@@ -451,18 +513,7 @@
       return safeKm;
     }
 
-    // Geocodificación libre vía Nominatim OSM
-    async function geocode(query) {
-      const clean = encodeURIComponent(`${query}, Argentina`);
-      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${clean}&limit=1`);
-      const data = await res.json();
-      if (data && data.length > 0) {
-        return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon), name: data[0].display_name.split(',')[0] };
-      }
-      return null;
-    }
-
-    // Ruteo real vía OSRM
+    // Trazado de ruta vía OSRM con coordenadas exactas [lng, lat]
     async function getRoute(origin, dest) {
       const url = `https://router.project-osrm.org/route/v1/driving/${origin.lng},${origin.lat};${dest.lng},${dest.lat}?overview=full&geometries=geojson&steps=false`;
       const res = await fetch(url);
@@ -473,59 +524,52 @@
       return null;
     }
 
-    // Algoritmo para planificar paradas cada 100km y días según max km/día
     async function planTrip() {
-      const origText = document.getElementById('inputOrigin').value.trim();
-      const destText = document.getElementById('inputDest').value.trim();
-      const maxKmDay = parseInt(document.getElementById('inputMaxKmDay').value) || 450;
-      const safeAutonomy = calculateAutonomy();
+      const idxO = parseInt(document.getElementById('selectOrigin').value);
+      const idxD = parseInt(document.getElementById('selectDest').value);
 
-      if (!origText || !destText) {
-        alert("Por favor ingresa origen y destino.");
+      if (idxO === idxD) {
+        alert("El origen y el destino deben ser ciudades distintas.");
         return;
       }
+
+      const origCity = ARGENTINA_CITIES[idxO];
+      const destCity = ARGENTINA_CITIES[idxD];
+
+      const maxKmDay = parseInt(document.getElementById('inputMaxKmDay').value) || 450;
+      const safeAutonomy = calculateAutonomy();
 
       document.getElementById('resultsPanel').style.display = "none";
       markersLayer.clearLayers();
       if (routeLayer) map.removeLayer(routeLayer);
 
-      // 1. Geocodificar
-      const origGeo = await geocode(origText);
-      const destGeo = await geocode(destText);
-
-      if (!origGeo || !destGeo) {
-        alert("No se pudieron ubicar las ciudades en Argentina. Intenta ser más específico.");
-        return;
-      }
-
-      // 2. Trazar ruta real
-      const route = await getRoute(origGeo, destGeo);
+      const route = await getRoute(origCity, destCity);
       if (!route) {
-        alert("No se pudo calcular una ruta por carretera entre esos puntos.");
+        alert("No se pudo calcular una ruta por asfalto entre esas ciudades.");
         return;
       }
 
+      // GeoJSON invierte coordenadas: [lng, lat] -> Leaflet necesita [lat, lng]
       const coords = route.geometry.coordinates.map(c => [c[1], c[0]]);
       const totalKm = Math.round(route.distance / 1000);
       const totalHours = (route.duration / 3600).toFixed(1);
 
-      // Dibujar línea principal
       routeLayer = L.polyline(coords, {
         color: '#38bdf8',
         weight: 5,
         opacity: 0.85
       }).addTo(map);
 
-      map.fitBounds(routeLayer.getBounds(), { padding: [50, 50] });
+      map.fitBounds(routeLayer.getBounds(), { padding: [40, 40] });
 
-      // Marcadores inicio y fin
+      // Marcadores de origen y destino
       const iconO = L.divIcon({ className: '', html: '<div class="custom-icon marker-origin" style="width:26px;height:26px;">A</div>', iconSize: [26, 26], iconAnchor: [13, 13] });
       const iconD = L.divIcon({ className: '', html: '<div class="custom-icon marker-dest" style="width:26px;height:26px;">B</div>', iconSize: [26, 26], iconAnchor: [13, 13] });
 
-      L.marker([origGeo.lat, origGeo.lng], { icon: iconO }).addTo(markersLayer).bindPopup(`<b>Origen:</b> ${origGeo.name}`);
-      L.marker([destGeo.lat, destGeo.lng], { icon: iconD }).addTo(markersLayer).bindPopup(`<b>Destino:</b> ${destGeo.name}`);
+      L.marker([origCity.lat, origCity.lng], { icon: iconO }).addTo(markersLayer).bindPopup(`<b>Origen:</b> ${origCity.name}`);
+      L.marker([destCity.lat, destCity.lng], { icon: iconD }).addTo(markersLayer).bindPopup(`<b>Destino:</b> ${destCity.name}`);
 
-      // 3. Particionar la ruta en jornadas y paradas de 100 km
+      // Partición en días y pausas de 100 km
       const daysCount = Math.max(1, Math.ceil(totalKm / maxKmDay));
       const stages = [];
       const ptsCount = coords.length;
@@ -538,7 +582,6 @@
         const endIdx = Math.floor(endRatio * (ptsCount - 1));
         const dayKm = Math.round(totalKm / daysCount);
 
-        // Estaciones de descanso cada ~100 km en ese tramo
         const restStopsCount = Math.floor(dayKm / 100);
         const stops = [];
 
@@ -549,9 +592,8 @@
             const stopCoord = coords[stopIdx];
             stops.push({ km: s * 100, coords: stopCoord });
 
-            // Marcador de descanso
             const rIcon = L.divIcon({ className: '', html: '<div class="custom-icon marker-rest" style="width:20px;height:20px;">☕</div>', iconSize: [20, 20], iconAnchor: [10, 10] });
-            L.marker(stopCoord, { icon: rIcon }).addTo(markersLayer).bindPopup(`<b>Día ${d}: Pausa km ${s * 100}</b><br>15 min estiramiento e hidratación.`);
+            L.marker(stopCoord, { icon: rIcon }).addTo(markersLayer).bindPopup(`<b>Día ${d}: Parada Técnica (${s * 100} km)</b><br>15-20 min de hidratación y estiramiento.`);
           }
         }
 
@@ -565,7 +607,7 @@
         });
       }
 
-      // Renderizar listado lateral
+      // Renderizar listado de etapas
       const stagesList = document.getElementById('stagesList');
       stagesList.innerHTML = '';
 
@@ -583,7 +625,7 @@
             <span class="day-title">Jornada ${st.day}</span>
             <span class="day-km-tag ${st.km > maxKmDay ? 'warn' : ''}">${st.km} km</span>
           </div>
-          <div class="stop-chips">${chipsHtml || '<span class="chip-stop">Tramo corto directo</span>'}</div>
+          <div class="stop-chips">${chipsHtml || '<span class="chip-stop">Tramo directo</span>'}</div>
         `;
 
         card.onclick = () => {
@@ -623,7 +665,11 @@
     }
 
     window.addEventListener('resize', () => map.invalidateSize());
+
+    // Inicializar datos y trazar la primera ruta al cargar
+    populateCitySelectors();
     calculateAutonomy();
+    planTrip();
   </script>
 </body>
 </html>
